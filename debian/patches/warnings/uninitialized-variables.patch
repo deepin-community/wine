@@ -1,0 +1,44 @@
+description: fix uninitialized variable warnings (gcc13 -Wuninitialized)
+author: Michael Gilbert <mgilbert@debian.org>
+
+--- a/tools/winebuild/import.c
++++ b/tools/winebuild/import.c
+@@ -166,8 +166,11 @@ static int func_cmp( const void *func1,
+ {
+     const ORDDEF *odp1 = *(const ORDDEF * const *)func1;
+     const ORDDEF *odp2 = *(const ORDDEF * const *)func2;
+-    return strcmp( odp1->name ? odp1->name : odp1->export_name,
+-                   odp2->name ? odp2->name : odp2->export_name );
++    const char *name1 = odp1->name ? odp1->name : odp1->export_name;
++    const char *name2 = odp2->name ? odp2->name : odp2->export_name;
++    if ( !name1 || !name2 )
++      fatal_error("Unable to compare function names\n");
++    return strcmp( name1, name2 );
+ }
+ 
+ /* remove a name from a name table */
+--- a/dlls/iphlpapi/iphlpapi_main.c
++++ b/dlls/iphlpapi/iphlpapi_main.c
+@@ -1023,7 +1023,9 @@ static DWORD gateway_and_prefix_addresse
+     struct nsi_ip_forward_rw *rw;
+     IP_ADAPTER_GATEWAY_ADDRESS *gw, **gw_next;
+     IP_ADAPTER_PREFIX *prefix, **prefix_next;
+-    DWORD err, count, i, prefix_len, key_size = (family == AF_INET) ? sizeof(*key4) : sizeof(*key6);
++    DWORD err, count, i;
++    DWORD prefix_len = 0;
++    DWORD key_size = (family == AF_INET) ? sizeof(*key4) : sizeof(*key6);
+     DWORD sockaddr_size = (family == AF_INET) ? sizeof(SOCKADDR_IN) : sizeof(SOCKADDR_IN6);
+     SOCKADDR_INET sockaddr;
+     NET_LUID *luid;
+@@ -1126,6 +1128,11 @@ static DWORD gateway_and_prefix_addresse
+                         err = ERROR_NOT_ENOUGH_MEMORY;
+                         goto err;
+                     }
++                    if (prefix_len == 0)
++                    {
++                        err = ERROR_INVALID_DATA;
++                        goto err;
++                    }
+                     prefix->Length = sizeof(*prefix);
+                     prefix->Address.lpSockaddr = (SOCKADDR *)(prefix + 1);
+                     prefix->Address.iSockaddrLength = sockaddr_size;
