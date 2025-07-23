@@ -15,7 +15,7 @@ Build-Depends:
  lld [armhf arm64],
  llvm [armhf arm64],
  clang [armhf arm64],
- gcc-mingw-w64-i686 [i386],
+ gcc-mingw-w64-i686 [amd64 i386],
  gcc-mingw-w64-x86-64 [amd64],
  libz-mingw-w64-dev,
  lzma,
@@ -93,8 +93,8 @@ Architecture: all
 Multi-Arch: foreign
 Depends:
  ${misc:Depends},
- wine64 (>= ${source:Version}) | wine32 (>= ${source:Version}),
- wine64 (<< ${source:Version}.1~) | wine32 (<< ${source:Version}.1~),
+ wine-bin (>= ${source:Version}),
+ wine-bin (<< ${source:Version}.1~),
 Suggests:
  q4wine,
  winbind,
@@ -118,8 +118,8 @@ Description: Windows API implementation - standard suite
  standard Wine components. It also employs the Debian alternatives system to
  provide the usual command names, e.g. "wine" instead of "wine-stable".
 
-Package: wine32
-Architecture: i386 armhf
+Package: wine-bin
+Architecture: amd64 arm64 i386 armhf
 Multi-Arch: foreign
 Depends:
  ${misc:Depends},
@@ -129,49 +129,28 @@ Recommends:
  wine (= ${source:Version}),
 Suggests:
  wine32-preloader (= ${binary:Version}),
-Description: Windows API implementation - 32-bit binary loader
+ wine64-preloader (= ${binary:Version}) [amd64 arm64],
+Provides:
+ wine32,
+ wine64 [amd64 arm64],
+Description: Windows API implementation - binary loader
  Wine is a free MS-Windows API implementation.
  .
- This package provides the binary loader for 32-bit Windows applications.
+ This package provides the binary loader for Windows applications.
 
-Package: wine64
-Architecture: amd64 arm64
+Package: wine-preloader
+Architecture: amd64 arm64 i386 armhf
 Multi-Arch: foreign
 Depends:
  ${misc:Depends},
- ${shlibs:Depends},
- libwine (= ${binary:Version}),
-Recommends:
- wine (= ${source:Version}),
- wine32 (= ${binary:Version}),
-Suggests:
- wine64-preloader (= ${binary:Version}),
-Description: Windows API implementation - 64-bit binary loader
+ wine-bin (= ${binary:Version}),
+Provides:
+  wine32-preloader,
+  wine64-preloader [amd64 arm64],
+Description: Windows API implementation - prelinked binary loader
  Wine is a free MS-Windows API implementation.
  .
- This package provides the binary loader for 64-bit Windows applications.
-
-Package: wine32-preloader
-Architecture: i386 armhf
-Multi-Arch: foreign
-Depends:
- ${misc:Depends},
- wine32 (= ${binary:Version}),
-Description: Windows API implementation - prelinked 32-bit binary loader
- Wine is a free MS-Windows API implementation.
- .
- This package provides the prelinked loader for 32-bit Windows applications.
-
-Package: wine64-preloader
-Architecture: amd64 arm64
-Multi-Arch: foreign
-Depends:
- ${misc:Depends},
- wine64 (= ${binary:Version}),
-Description: Windows API implementation - prelinked 64-bit binary loader
- Wine is a free MS-Windows API implementation.
- .
- This package provides the prelinked loader for 64-bit Windows applications.
+ This package provides the prelinked loader for Windows applications.
 
 Package: wine32-tools
 Section: libdevel
@@ -225,7 +204,7 @@ Depends:
  ${misc:Depends},
  ${dlopen:Depends},
  ${shlibs:Depends},
- libz-mingw-w64 (>= 1.2.11+dfsg-4),
+ libz-mingw-w64 (>= 1.2.11+dfsg-3),
 Recommends:
  ${dlopen:Recommends},
  libgl1-mesa-dri,

@@ -1,3 +1,10 @@
+wine (10.0~repack-6deepin1) unstable; urgency=medium
+
+  * fix dependency for libz-mingw
+  * enable wow64
+
+ -- Chang Yang <yangchang@deepin.org>  Wed, 23 Jul 2025 17:16:55 +0800
+
 wine (10.0~repack-6) unstable; urgency=medium
 
   * Apply upstream patches fixing relocation entry point handling in

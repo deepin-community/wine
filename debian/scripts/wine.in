@@ -1,33 +1,9 @@
 #!/bin/sh -e
 
-wine32=/BINDIR/wine
-wine64=/BINDIR/wine64
+wineall=/BINDIR/wine
 
-wine32_hint () {
-    echo "it looks like wine32VERSION is missing, you should install it."
-    if [ "$(dpkg --print-architecture)" = "amd64" ] && ! dpkg --print-foreign-architectures | grep -qx "i386"; then
-        echo "multiarch needs to be enabled first.  as root, please"
-        echo "execute \"dpkg --add-architecture i386 && apt-get update &&"
-        echo "apt-get install wine32VERSION:i386\""
-    else
-        echo "as root, please execute \"apt-get install wine32VERSION:i386\""
-    fi
-}
-
-if test -x $wine32; then
-    wine=$wine32
-elif test -x $wine64; then
-    wine=$wine64
-    if test -z "$WINELOADER"; then
-        export WINELOADER=$wine64
-    fi
-    case "x$WINEDEBUG" in
-        x-all*|x*,-all*|x*err-all*)
-            ;;
-        *)
-            wine32_hint >&2
-            ;;
-    esac
+if test -x $wineall; then
+    wine=$wineall
 else
     echo "error: unable to find wine executable.  this shouldn't happen." >&2
     exit 1
