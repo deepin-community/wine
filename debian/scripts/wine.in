@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+wineall=/BINDIR/wine
+
+if test -x $wineall; then
+    wine=$wineall
+else
+    echo "error: unable to find wine executable.  this shouldn't happen." >&2
+    exit 1
+fi
+
+if test -z "$WINEDEBUG"; then
+    export WINEDEBUG=fixme-all
+fi
+
+exec $wine "$@"
